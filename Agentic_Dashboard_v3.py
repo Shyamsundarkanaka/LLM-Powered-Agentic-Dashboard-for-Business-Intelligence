@@ -19,11 +19,12 @@ from typing import Literal
 from dashboard_tool import run_dashboard
 
 import os
+from openai import OpenAI
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-perplexity_api = os.getenv("PERPLEXITY_API_KEY")
 
 
 #### Read Data
@@ -35,36 +36,39 @@ with open(fr'C:\Users\shyam\OneDrive\Desktop\Sales Agentic AI\dashboard_ai\files
     Tool_Guidelines = file.read()
 
 
-from openai import OpenAI
+
+
+########################################################################################################################
+gemini_api_key_2 = os.getenv("gemini_api_key_2")
 
 client = OpenAI(
-api_key=perplexity_api,
-base_url="https://api.perplexity.ai"
+    api_key=gemini_api_key_2,
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
-def get_response(system_prompt , prompt):
-        
-    response = client.chat.completions.create(
-    model="sonar",
-    messages=[
-                        {"role": "system", "content":system_prompt},  # System Role
-                        {"role": "user", "content": prompt}  # User Message
-                    ]
-                )
-        
-    response_str = response.choices[0].message.content 
-    return response_str
+def get_response(system_prompt, prompt):
 
-# api_key = ""
+    response = client.chat.completions.create(
+        model="gemini-2.5-flash",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return response.choices[0].message.content
+########################################################################################################################
+
+# deepseek_api_key = os.getenv("deepseek_api_key")
 # client = OpenAI(
 #                 base_url="https://openrouter.ai/api/v1",
-#                 api_key= api_key,
+#                 api_key= deepseek_api_key,
 #             )
 
 # def get_response(system_prompt , prompt):
 #     response = client.chat.completions.create(
             
-#     model="deepseek/deepseek-r1:free",
+#     model="deepseek/deepseek-r1",
 #     messages=[
 #                     {"role": "system", "content":system_prompt},  # System Role
 #                     {"role": "user", "content": prompt}  # User Message
@@ -74,6 +78,7 @@ def get_response(system_prompt , prompt):
 #     response_str = response.choices[0].message.content 
 #     return response_str
 
+########################################################################################################################
 
 
 
