@@ -14,47 +14,50 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-########################################################################################################################
-gemini_api_key_2 = os.getenv("gemini_api_key_2")
+################################################################################################################################## 
+
+# base_url="https://generativelanguage.googleapis.com/v1beta/openai/"        ### GEMINI
+# base_url="https://openrouter.ai/api/v1"                                    ### OPEN ROUTER
+base_url = "https://api.groq.com/openai/v1"                                   ### GROQ
+
+
+################################################################################################################################## 
+
+# api_key = os.getenv("deepseek_api_key")
+# api_key = os.getenv("gemini_api_key_1")
+# api_key = os.getenv("gemini_api_key_2")
+# api_key = os.getenv("gemini_api_key_3")
+api_key = os.getenv("groq_api_key")
+
+
+
+################################################################################################################################## 
+
+# model="gemini-2.5-flash"                            ### GEMINI
+# model="deepseek/deepseek-r1",                      ### OPEN ROUTER
+# model ="nvidia/nemotron-3-ultra-550b-a55b:free"    ### OPEN ROUTER
+model = "llama-3.3-70b-versatile"                       ### GROQ
+
+##### API Connection ###############################################################################################
 
 client = OpenAI(
-    api_key=gemini_api_key_2,
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-)
+                base_url=base_url,
+                api_key= api_key
+            )
 
-def get_response(system_prompt, prompt):
-
+def get_response(system_prompt , prompt):
     response = client.chat.completions.create(
-        model="gemini-2.5-flash",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
-        ]
-    )
-
-    return response.choices[0].message.content
-########################################################################################################################
-
-# deepseek_api_key = os.getenv("deepseek_api_key")
-# client = OpenAI(
-#                     base_url="https://openrouter.ai/api/v1",
-#                     api_key= deepseek_api_key,
-#                 )
-
-# def get_response(system_prompt , prompt):
-#     response = client.chat.completions.create(
-                
-#     model="deepseek/deepseek-r1",
-#     messages=[
-#                         {"role": "system", "content":system_prompt},  # System Role
-#                         {"role": "user", "content": prompt}  # User Message
-#                     ]
-#                 )
             
-#     response_str = response.choices[0].message.content 
-#     return response_str
+    model=model,
+    messages=[
+                    {"role": "system", "content":system_prompt},  # System Role
+                    {"role": "user", "content": prompt}  # User Message
+                ]
+            )
+        
+    response_str = response.choices[0].message.content 
+    return response_str
 
-########################################################################################################################
 
 
 def run_dashboard(df, all_plots):
@@ -303,7 +306,15 @@ def run_dashboard(df, all_plots):
                 
                 
             elif type_chart == 'line':  # New chart type handling ## CHANGED FOR ADDED GRAPH
-                fig = px.line(filtered_df, x=all_plots[tab_num]['x_axis'], y=all_plots[tab_num]['y_axis'])
+                x_axis = all_plots[tab_num]['x_axis']
+                y_axis = all_plots[tab_num]['y_axis']
+                grouped_df = (
+                    filtered_df
+                    .groupby(x_axis)[y_axis]
+                    .sum()
+                    .reset_index()
+                )
+                fig = px.line(grouped_df, x=x_axis, y=y_axis)
                 
 
             elif type_chart == 'box':  # New chart type handling ## CHANGED FOR ADDED GRAPH

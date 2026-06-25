@@ -26,59 +26,60 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+################################################################################################################################## 
+
+# base_url="https://generativelanguage.googleapis.com/v1beta/openai/"        ### GEMINI
+# base_url="https://openrouter.ai/api/v1"                                    ### OPEN ROUTER
+base_url = "https://api.groq.com/openai/v1"                                   ### GROQ
+
+
+################################################################################################################################## 
+
+# api_key = os.getenv("deepseek_api_key")
+# api_key = os.getenv("gemini_api_key_1")
+# api_key = os.getenv("gemini_api_key_2")
+# api_key = os.getenv("gemini_api_key_3")
+api_key = os.getenv("groq_api_key")
+
+################################################################################################################################## 
+
+# model="gemini-2.5-flash"                            ### GEMINI
+# model="deepseek/deepseek-r1",                      ### OPEN ROUTER
+# model ="nvidia/nemotron-3-ultra-550b-a55b:free"    ### OPEN ROUTER
+model = "llama-3.3-70b-versatile"                       ### GROQ
+
+
+
+##### API Connection ###############################################################################################
 
 #### Read Data
-df = pd.read_csv(fr'C:\Users\shyam\OneDrive\Desktop\Sales Agentic AI\dashboard_ai\files\train.csv')
-
-user_query = "Compare order volume across Customer Segments."
+# df = pd.read_csv(fr'C:\Users\shyam\OneDrive\Desktop\Sales Agentic AI\dashboard_ai\files\train.csv')
+# user_query = "Compare order volume across Customer Segments."
 
 with open(fr'C:\Users\shyam\OneDrive\Desktop\Sales Agentic AI\dashboard_ai\files\Guidelines of the dashboard tool.txt', 'r') as file:
     Tool_Guidelines = file.read()
 
-
-
-
-########################################################################################################################
-gemini_api_key_2 = os.getenv("gemini_api_key_2")
+##### API Connection ###############################################################################################
 
 client = OpenAI(
-    api_key=gemini_api_key_2,
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-)
+                base_url=base_url,
+                api_key= api_key
+            )
 
-def get_response(system_prompt, prompt):
-
+def get_response(system_prompt , prompt):
     response = client.chat.completions.create(
-        model="gemini-2.5-flash",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
-        ]
-    )
-
-    return response.choices[0].message.content
-########################################################################################################################
-
-# deepseek_api_key = os.getenv("deepseek_api_key")
-# client = OpenAI(
-#                 base_url="https://openrouter.ai/api/v1",
-#                 api_key= deepseek_api_key,
-#             )
-
-# def get_response(system_prompt , prompt):
-#     response = client.chat.completions.create(
             
-#     model="deepseek/deepseek-r1",
-#     messages=[
-#                     {"role": "system", "content":system_prompt},  # System Role
-#                     {"role": "user", "content": prompt}  # User Message
-#                 ]
-#             )
+    model=model,
+    messages=[
+                    {"role": "system", "content":system_prompt},  # System Role
+                    {"role": "user", "content": prompt}  # User Message
+                ]
+            )
         
-#     response_str = response.choices[0].message.content 
-#     return response_str
+    response_str = response.choices[0].message.content 
+    return response_str
 
-########################################################################################################################
+################################################################################################################### 
 
 
 
@@ -261,7 +262,7 @@ def data_preprocesser_node(state:State):
         elif df_clean[col].dtype == 'object' and any(
             keyword in col.lower() for keyword in ['date', 'time', 'created', 'updated']):
             
-            sample_vals = df_clean[col].dropna()
+            sample_vals = df_clean[col].dropna()    
             if sample_vals.shape[0] > 0:
                 sample_vals = sample_vals.sample(min(10, sample_vals.shape[0]))
 
@@ -334,6 +335,8 @@ def plot_selector(state:State):
 
     Guidelines of the dashboard tool : $$$ {state['tool_guidelines']} $$$
 
+    Columns Available:  $$$ {list(state['data_frame'].columns)}  $$$ 
+
     Data Information : $$$ {state['data_frame'].describe(include='all')} $$$
 
     User Query : $$$ {state['user_query']}  $$$
@@ -345,6 +348,11 @@ def plot_selector(state:State):
     - OUTPUT MUST START WITH {{ and END WITH }}
     - THE OUTPUT PROVIDED WILL BE DIRECTLY PASSED TO THE TOOL SO MAKE SURE THE OUTPUT IS A JSON IN CORRECT FORMAT
     - WITH THE KEYS 'one' , 'two' and so on and the values are JSONS with the keys ['type', 'x_axis', 'y_axis', 'category_filter_column', 'numerical_filter_column', 'filter_type', 'cat_filter_value', 'num_filter_min', 'num_filter_max', 'purpose_of_plot']
+    - Use ONLY column names from the list above.
+    - Do NOT rename columns.
+    - Do NOT create new columns.
+    - Every x_axis, y_axis and filter column must exactly match one of the available columns.
+    - EVERY GRAPH SHOULD HAVE EXCATLY 1 FILTER EITHER category_filter_column OR numerical_filter_column, other should be a None
     
     RESPOND WITH ONLY RAW JSON - NO MARKDOWN CODE BLOCKS.
     """

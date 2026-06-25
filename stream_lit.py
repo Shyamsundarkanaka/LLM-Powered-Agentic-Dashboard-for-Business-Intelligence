@@ -34,8 +34,12 @@ if st.button("Submit"):
                 "tool_guidelines": Tool_Guidelines
             }
 
-            output = gen_bi_worker.invoke(state)
-            
+            start_time = time.time()    
+            output = gen_bi_worker.invoke(state)    
+            end_time = time.time()
+            processing_time = round(end_time - start_time, 2)
+            print(f"Processing Time: {processing_time} seconds")
+
             # **CHANGED: Check if query is irrelevant**
             if output.get('relevance_status') == 'NO':
                 st.error("❌ Your query appears to be irrelevant to the available data. Please ask questions related to the sales portfolio data.")

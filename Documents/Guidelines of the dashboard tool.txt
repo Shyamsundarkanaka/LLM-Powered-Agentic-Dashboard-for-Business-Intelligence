@@ -1,0 +1,76 @@
+To effectively utilize the tool you've provided, it's important to understand the specifications, requirements, rules, and limitations regarding input data and how plots can be configured. Here's a comprehensive guide for using this dashboard tool.
+
+Dashboard Tool Configuration Guidelines
+Supported Plot Types and Requirements:
+
+1. Bar Plot
+X-Axis: Categorical Column (e.g., 'Category Name')
+Y-Axis: Numerical Column (e.g., 'Sales Amount')
+Filter Type: Categorical
+Filter Column: category_filter_column
+Default Values: list of default values for filters.
+
+2.Scatter Plot
+X-Axis: Numerical Column (e.g., 'Age')
+Y-Axis: Numerical Column (e.g., 'Income')
+Filter Type: Numerical
+Filter Column: numerical_filter_column
+Min and Max Values: Must be defined.
+
+3.Box Plot
+X-Axis: Categorical Column (e.g., 'Group')
+Y-Axis: Numerical Column (e.g., 'Scores')
+Filter Type: Categorical
+Filter Column: category_filter_column
+Default Values: List of default values for filters.
+
+4.Histogram
+X-Axis: Numerical Column (e.g., 'Height')
+Y-Axis: Not applicable (counts occurrences)
+Filter Type: Numerical
+Filter Column: numerical_filter_column
+Min and Max Values: Must be defined.
+
+5.Pie Chart
+X-Axis: Categorical Column (e.g., 'Category')
+Y-Axis: Numerical Column (e.g., 'Count')
+Filter Type: Categorical
+Filter Column: category_filter_column
+Default Values: List of default values for filters.
+
+Input Requirements
+Data Columns: Each plot requires an appropriate configuration of data columns. This can typically involve:
+
+At least one categorical column for categorization.
+At least one numerical column for quantitative assessment.
+Filter Requirements:
+
+Exactly one filter per graph: Each plot must have one active filter.
+Filter Type: Must be either 'categorical' or 'numerical'.
+Values for Filters: For categorical filters, values should be specified as a list of accepted categories. For numerical filters, both the minimum and maximum values need to be set.
+Plot Scale and Limitations
+The dashboard can support a minimum of 1 plot and a maximum of 6 plots.
+Each plot must be defined comprehensively in the all_plots dictionary according to the specific format detailed below:
+all_plots = {
+    'one': {
+        'type': 'bar' | 'scatter' | 'box' | 'histogram' | 'pie',
+        'x_axis': 'Column Name for X Axis',
+        'y_axis': 'Column Name for Y Axis',
+        'category_filter_column': 'Category Column Name' if filter_type is 'categorical' else None,
+        'numerical_filter_column': 'Numerical Column Name' if filter_type is 'numerical' else None,
+        'filter_type': 'categorical'/'numerical',
+        'cat_filter_value': ['value1', 'value2'] if filter_type is 'categorical' else None,
+        'num_filter_min': min_value if filter_type is 'numerical' else None,
+        'num_filter_max': max_value if filter_type is 'numerical' else None,
+        'purpose_of_plot' : str containing what question this plots tries to answer.
+    },
+    'two': {
+        # Configuration similar to 'one'
+    },
+    # Continue similarly for 'three', 'four', 'five', 'six' as needed.
+}
+Summary of Rules
+Filter setup is mandatory for each graph.
+Categorical filters must denote specific values from existing categories.
+Numerical filters require min/max values and should apply to an appropriate numerical column.
+Ensure to conform to the input specification for each plot type to ensure accurate rendering and insights generation.
